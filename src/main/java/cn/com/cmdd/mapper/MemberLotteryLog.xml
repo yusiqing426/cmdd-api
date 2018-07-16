@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.MemberLotteryLogDao">
+	
+	<select id="getMemberLotteryLogListByPhoneAndShopId" resultType="MemberLotteryLog">
+		SELECT * FROM member_lottery_log WHERE phone = #{1} and shop_id = #{0} ORDER BY id
+	</select>
+	
+	<select id="getMemberLotteryLogByOrderId" resultType="MemberLotteryLog">
+		SELECT * FROM member_lottery_log WHERE order_id = #{0} ORDER BY id
+	</select>
+	
+	<insert id="addMemberLotteryLog" parameterType="MemberLotteryLog">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT INTO
+			member_lottery_log(
+				id,lottery_detail,shop_id,order_id,is_cash,phone,create_time,exchange_time,sync_status
+				)
+		VALUES (
+			COALESCE(#{id},UUID_SHORT()),#{lottery_detail},#{shop_id},#{order_id},#{is_cash},#{phone},now(),now(),#{sync_status}
+			)
+	</insert>
+
+	<insert id="insertById" parameterType="MemberIntegral">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT INTO
+			member_lottery_log(
+				id,
+				lottery_detail,
+				shop_id,
+				order_id,
+				is_cash,
+				phone,
+				create_time,
+				exchange_time,
+				sync_status
+				)
+		VALUES (
+			COALESCE(
+				#{id},UUID_SHORT()),
+				#{lottery_detail},
+				#{shop_id},
+				#{order_id},
+				#{is_cash},
+				#{phone},
+				COALESCE(#{create_time},now()),
+				COALESCE(#{exchange_time},now()),
+				COALESCE(#{sync_status},sync_status)
+			)
+		ON DUPLICATE KEY
+		UPDATE
+			lottery_detail = COALESCE(#{lottery_detail},lottery_detail),
+			shop_id = COALESCE(#{shop_id},shop_id),
+			order_id = COALESCE(#{order_id},order_id),
+			is_cash=COALESCE(#{is_cash},is_cash),
+			phone=COALESCE(#{phone},phone),
+			sync_status=COALESCE(#{sync_status},sync_status),
+			create_time=COALESCE(#{create_time},create_time),
+			exchange_time=COALESCE(#{exchange_time},now())
+	</insert>
+
+	<select id="getMemberLotteryLogById" resultType="MemberLotteryLog" parameterType="int">
+		select id,lottery_detail,shop_id,order_id,is_cash,phone,create_time,exchange_time,sync_status from member_lottery_log where id = #{0}
+	</select>
+	
+	<select id="getMemberLotteryLogListByOrderId" resultType="MemberLotteryLog">
+		select * from member_lottery_log where order_id = #{0}
+	</select>
+	
+	<update id="updateMemberLotteryLog" parameterType="MemberLotteryLog">
+		UPDATE
+			member_lottery_log
+		SET
+			lottery_detail = COALESCE(#{lottery_detail},lottery_detail),
+			shop_id = COALESCE(#{shop_id},shop_id),
+			order_id = COALESCE(#{order_id},order_id),
+			is_cash=COALESCE(#{is_cash},is_cash),
+			phone=COALESCE(#{phone},phone),
+			create_time=COALESCE(#{create_time},create_time),
+			exchange_time=COALESCE(#{exchange_time},now()),
+			sync_status	=	#{sync_status}
+		WHERE
+			id = #{id}
+	</update>
+	
+	
+	<delete id="deleteMemberLotteryLog">	
+		DELETE 
+		FROM member_lottery_log
+		WHERE id = #{id}
+	</delete>
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="MemberLotteryLog">
+		SELECT 
+			*
+		FROM 
+			Member_Lottery_Log
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+	
+
+
+</mapper>
+
+
+
+
+ 

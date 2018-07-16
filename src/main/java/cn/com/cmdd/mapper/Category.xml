@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.CategoryDao">
+	<insert id="saveCategory" parameterType="Category">
+        <selectKey resultType="Long" order="BEFORE" keyProperty="id">
+            SELECT COALESCE(#{id},UUID_SHORT()) AS id
+        </selectKey>
+		INSERT INTO
+			category(
+				id,
+				shop_id,
+				name,
+				is_enable,
+				sort,
+				sync_status
+				)
+		VALUES(
+			  #{id},
+			  #{shop_id},
+			  #{name},
+			  #{is_enable},
+			  #{sort},
+			  #{sync_status}
+		      )
+	</insert>
+
+	<insert id="insertById" parameterType="Category">
+		INSERT INTO
+			category(
+                id,
+                shop_id,
+                name,
+                is_enable,
+                sort,
+                sync_status
+			)
+		VALUES(
+			#{id},
+			#{shop_id},
+			#{name},
+			#{is_enable},
+			#{sort},
+			#{sync_status}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+		    shop_id   	= 	#{shop_id},
+			name      	= 	#{name},
+			is_enable 	= 	#{is_enable},
+			sort      	= 	#{sort},
+			sync_status	= 	#{sync_status}
+	</insert>
+	
+	<delete id="deleteCategory" parameterType="Long">
+		DELETE	
+		FROM
+			category
+		WHERE
+			id=#{id}
+	</delete>
+		
+	<update id="updateCategory" parameterType="Category">
+		UPDATE
+			category
+		SET
+			shop_id		=	COALESCE(#{shop_id},shop_id),
+			name 		=	COALESCE(#{name},name),
+			is_enable 	=	COALESCE(#{is_enable},is_enable),
+			sort 		=	COALESCE(#{sort},sort),
+			sync_status	=	COALESCE(#{sync_status},sync_status)
+		WHERE
+			id=#{id}
+	</update>
+
+	<!--<update id="updateSync_status" parameterType="Category">
+		UPDATE
+			category
+		SET
+			sync_status	=	1
+		WHERE
+			id=#{id}
+	</update>-->
+	
+	<select id="getCategory" resultType="Category">
+		SELECT
+			id,
+			shop_id,
+			name,
+			is_enable,
+			sort,
+			sync_status
+		FROM
+			category
+		<trim prefix="WHERE" >
+			<if test="shop_id!=null">
+				shop_id=#{shop_id}
+			</if>
+			<if test="id!=null">
+				id=#{id}
+			</if>
+		</trim>
+		ORDER BY id ASC
+	</select>
+	
+	<select id="select" resultType="Category">
+		SELECT 
+			id,shop_id,name,is_enable,sort,sync_status
+		FROM 
+			category
+		WHERE 
+			id = #{0}
+	</select>
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Category">
+		SELECT 
+			id,
+			shop_id,
+			name,
+			is_enable,
+			sort,
+			sync_status
+		FROM 
+			category
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+
+	
+</mapper>

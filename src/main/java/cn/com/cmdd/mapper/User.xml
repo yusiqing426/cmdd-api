@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.UserDao">
+
+	
+	<insert id="addUser">
+		INSERT INTO 
+			user(user_id,account,user_key,sync_status)
+		VALUES 
+			(
+				#{user_id},
+				#{account},
+				#{user_key},
+				COALESCE(#{sync_status},sync_status)
+			  	)
+	</insert>
+
+	<insert id="insertById" parameterType="User">
+		INSERT INTO
+			user(
+			user_id,
+			account,
+			user_key,
+			sync_status
+		)VALUES(
+			#{user_id},
+			#{account},
+			#{user_key},
+			#{sync_status}
+		  )
+		ON DUPLICATE KEY
+		UPDATE
+			account 	= 	#{account},
+			user_key 	= 	#{user_key},
+			sync_status = 	#{sync_status}
+
+	</insert>
+	<update id="update" parameterType="User">
+		UPDATE
+			user
+		SET
+			account		= 	#{account},
+			user_key	= 	#{user_key},
+			sync_status = 	#{sync_status}
+		WHERE
+			user_id 	= 	#{user_id}
+	</update>
+	
+	<select id="getUserByAccount" resultType="User">
+		SELECT 
+			user_id,
+			account,
+			user_key,
+			sync_status
+		FROM 
+			user 
+		WHERE 
+			account = #{0}
+	</select>
+	
+	<select id="getUserPlatformByAccount" resultType="User">
+		SELECT u.user_id, 
+		u.account, 
+		u.user_key,
+		p.password as password,
+		sync_status
+		
+		FROM user AS u INNER JOIN platform AS p ON u.user_id = p.id
+		WHERE u.account = #{0}
+		
+	</select>
+	
+	<select id="getUserAgentByAccount" resultType="User">
+		SELECT u.user_id, 
+		u.account, 
+		u.user_key,
+		a.password as password,
+		a.is_in_use as is_in_use,
+		sync_status
+		
+		FROM user AS u INNER JOIN agent AS a ON u.user_id = a.id
+		WHERE u.account = #{0}
+		
+	</select>
+
+	<select id="getUserShopByAccount" resultType="User">
+		SELECT u.user_id,
+		u.account, 
+		u.user_key,
+		s.password as password,
+		s.is_in_use as is_in_use,
+		u.sync_status
+		
+		FROM user AS u INNER JOIN shop AS s ON u.user_id = s.id
+		WHERE u.account = #{0}
+		
+	</select>
+	
+	<select id="getUserStaffByAccount" resultType="User">
+		SELECT u.user_id, 
+		u.account, 
+		u.user_key,
+		s.password as password,
+		s.is_in_use as is_in_use,
+		u.sync_status
+		
+		FROM user AS u INNER JOIN staff AS s ON u.user_id = s.id
+		WHERE u.account = #{0}
+		
+	</select>
+	
+	<!-- synchronous data  -->
+	<select id="selectByIsUpload" resultType="User">
+		SELECT 
+			user_id,
+			account,
+			user_key,
+			sync_status
+		FROM 
+			User
+		WHERE 
+			sync_status = 0
+	</select>
+
+	
+	
+	
+</mapper>

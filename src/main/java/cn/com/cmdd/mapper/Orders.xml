@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.OrdersDao">
+	<!--基础信息:仅录入基本信息-->
+	<insert id="saveOrders" parameterType="Orders">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT INTO 
+			orders(
+					id ,
+					order_no ,
+					order_pno ,
+					shop_id ,
+					serial_id ,
+					dining_table_id ,
+					table_runner ,
+					create_time,
+					total_free,
+					real_pay,
+					pay_time,
+					back_time,
+					type_pay,
+					pay_person,
+					status_id,
+					description,
+					discount,
+					residue,
+					income,
+					odd,
+					service_charge,
+					member_id,
+					member_identifier,
+					member_card_name,
+					member_card_discount,
+					trade_member_Integral,
+					trade_member_money,
+					trade_cash,
+					trade_wechat,
+					trade_alipay,
+					trade_creditCard,
+					type_hypotaxis,
+					sync_status
+					)
+			VALUES(		
+					COALESCE(#{id},UUID_SHORT()),
+					#{order_no},
+					#{orderPno},
+					#{shop_id},
+					#{serial_id},
+					#{dining_table_id},				
+					#{table_runner},
+					COALESCE(#{create_time},now()),
+					#{total_free},
+					#{real_pay},
+					#{pay_time},		
+					#{back_time},
+					#{pay_type},
+					#{pay_person},
+					#{status_id},
+					#{description},
+					#{discount},
+					#{residue},
+					#{income},
+					#{odd},
+					#{service_charge},
+					#{memberId},
+					#{memberIdentifier},
+					#{memberCardName},
+					#{memberCardDiscount},
+					#{tradeMemberIntegral},
+					#{tradeMemberMoney},
+					#{tradeCash},
+					#{tradeWechat},
+					#{tradeAlipay},
+					#{tradeCreditCard},					
+					COALESCE(#{typeHypotaxis},0),
+					COALESCE(#{sync_status},sync_status)
+				)
+	</insert>
+
+
+	<insert id="insertById" parameterType="Orders">
+		INSERT INTO
+			orders(
+				id ,
+				order_no ,
+				order_pno ,
+				shop_id ,
+				serial_id ,
+				dining_table_id ,
+				table_runner ,
+				create_time,
+				total_free,
+				real_pay,
+				pay_time,
+				back_time,
+				type_pay,
+				pay_person,
+				status_id,
+				description,
+				discount,
+				residue,
+				income,
+				odd,
+				service_charge,
+				member_id,
+				member_identifier,
+				member_card_name,
+				member_card_discount,
+				trade_member_Integral,
+				trade_member_money,
+				trade_cash,
+				trade_wechat,
+				trade_alipay,
+				trade_creditCard,
+				type_hypotaxis,
+				sync_status
+				)
+			VALUES(
+					#{id}					,
+					#{order_no}				,
+					#{orderPno}				,
+					#{shop_id}				,
+					#{serial_id}			,
+					#{dining_table_id}		,
+					#{table_runner}			,
+					#{create_time}			,
+					#{total_free}			,
+					#{real_pay}				,
+					#{pay_time}				,
+					#{back_time}			,
+					#{pay_type}				,
+					#{pay_person}			,
+					#{status_id}			,
+					#{description}			,
+					#{discount}				,
+					#{residue}				,
+					#{income}				,
+					#{odd}					,
+					#{service_charge}		,
+					#{memberId}				,
+					#{memberIdentifier}		,
+					#{memberCardName}		,
+					#{memberCardDiscount}	,
+					#{tradeMemberIntegral}	,
+					#{tradeMemberMoney}		,
+					#{tradeCash}			,
+					#{tradeWechat}			,
+					#{tradeAlipay}			,
+					#{tradeCreditCard}		,
+					#{typeHypotaxis}		,
+					#{sync_status}
+				)
+				ON DUPLICATE KEY
+				UPDATE
+					order_no							=	#{order_no}						,	
+					order_pno							=	#{orderPno}						,	
+					shop_id								=	#{shop_id}						,	
+					serial_id							=	#{serial_id}					,	
+					dining_table_id						=	#{dining_table_id}				,	
+					table_runner						=	#{table_runner}					,	
+					total_free							=	#{total_free}					,	
+					real_pay							=	#{real_pay}						,	
+					type_pay							=	#{pay_type}						,	
+					pay_person							=	#{pay_person}					,	
+					discount							=	#{discount}						,	
+					residue								=	#{residue}						,	
+					income								=	#{income}						,	
+					odd		 							=	#{odd}							,	
+					service_charge						=	#{service_charge}				,	
+					status_id							=	#{status_id}					,	
+					pay_time							=	#{pay_time}						,	
+					status_id							=	#{status_id}					,	
+					type_pay							=	#{pay_type}						,	
+					member_id							=	#{memberId}						,	
+					member_identifier 					=	#{memberIdentifier}				,	
+					member_card_name 					=	#{memberCardName}				,	
+					member_card_discount				=	#{memberCardDiscount}			,	
+					trade_member_integral 				=	#{tradeMemberIntegral}			,
+					trade_member_money 					=	#{tradeMemberMoney}				,	
+					trade_cash 							=	#{tradeCash}					,	
+					trade_wechat 						=	#{tradeWechat}					,	
+					trade_alipay 						=	#{tradeAlipay}					,	
+					trade_creditCard 					=	#{tradeCreditCard}				,	
+					is_use_member						= 	#{isUseMember}					,	
+					type_hypotaxis						=	#{typeHypotaxis}				,	
+					description							=	#{description}					,	
+					discount_preferential_money			=	#{discountPreferentialMoney}	,	
+					sync_status          				= 	#{sync_status}						
+
+	</insert>
+
+	<!--171103+结账之后删除呼叫服务-->
+	<delete id="deleteCallService">
+		DELETE
+		FROM
+		call_service
+		WHERE
+		order_id IN(
+		SELECT
+		o2.id
+		FROM
+		orders o2
+		WHERE
+		o2.order_no = ( SELECT o1.order_no FROM orders o1 WHERE o1.id =#{orderId})
+		)
+	</delete>
+
+	<!-- 通过桌位ID删除呼叫服务 -->
+	<delete id="deleteCallServiceByDiningTableId">
+		DELETE
+		FROM
+		call_service
+		WHERE
+		dining_table_id = #{diningTableId}
+	</delete>
+
+	<!-- 171202+订单项 -->
+	<delete id="deleteOrderItemByDiningTableId">
+		DELETE
+		FROM
+		order_product_log
+		WHERE
+		order_id = (SELECT o.id FROM ( SELECT id FROM orders WHERE dining_table_id = #{diningTableId} and status_id = 0 ) o)
+	</delete>
+
+	<!--171103+结账之后删除对应订单会员奖品-->
+	<delete id="deleteMemberLotterLogByOrderId">
+		DELETE FROM member_lottery_log
+		WHERE
+		order_id IN(
+		SELECT
+		o2.id
+		FROM
+		orders o2
+		WHERE
+		o2.order_no = ( SELECT o1.order_no FROM orders o1 WHERE o1.id =#{orderId})
+		)
+	</delete>
+
+	<delete id="deleteOrders" parameterType="Integer">
+		DELETE	
+		FROM 
+			orders
+		WHERE 
+			id=#{id} 
+	</delete>
+		
+	<update id="updateOrders" parameterType="Orders">
+		UPDATE
+			orders o 
+				LEFT JOIN 
+					order_product_log opl
+			ON
+				o.id	=	opl.order_id 	
+		SET  
+			o.order_no			=	COALESCE(#{order_no},o.order_no),
+			o.order_pno			=	COALESCE(#{orderPno},o.order_pno),
+			o.shop_id			=	COALESCE(#{shop_id},o.shop_id),
+			o.serial_id			=	COALESCE(#{serial_id},o.serial_id),
+			o.dining_table_id	=	COALESCE(#{dining_table_id},o.dining_table_id),
+			o.table_runner		=	COALESCE(#{table_runner},o.table_runner),
+			o.total_free		=	COALESCE(#{total_free},o.total_free),
+			o.real_pay			=	COALESCE(#{real_pay},o.real_pay),
+			o.type_pay			=	COALESCE(#{pay_type},o.type_pay),
+			o.pay_person		=	COALESCE(#{pay_person},o.pay_person),
+			o.discount			=	COALESCE(#{discount},o.discount),
+			o.residue			=	COALESCE(#{residue},o.residue),
+			o.income			=	COALESCE(#{income},o.income),
+			o.odd		 		=	COALESCE(#{odd},o.odd),
+			o.service_charge	=	COALESCE(#{service_charge},o.service_charge),
+			o.status_id			=	COALESCE(#{status_id},o.status_id),
+			/*TODO*/
+			<if test="status_id==1">
+				o.pay_time		=	now(),
+				opl.status_pay	= 	1,
+				/*TODO*/
+				opl.sync_status	=	0,
+			</if> 
+			<if test="status_id==2" >
+				o.type_pay 		= 	210,
+				o.pay_time		=	now(),
+				opl.status_pay	= 	2,
+				opl.sync_status	=	0,
+			</if>
+			/*17/11/03+*/
+			o.member_id				=	COALESCE(#{memberId},o.member_id),
+			o.member_identifier 	=	COALESCE(#{memberIdentifier},o.member_identifier),
+			o.member_card_name 		=	COALESCE(#{memberCardName},o.member_card_name),
+			o.member_card_discount	=	COALESCE(#{memberCardDiscount},o.member_card_discount),
+			o.trade_member_integral =	COALESCE(#{tradeMemberIntegral},o.trade_member_integral),
+			o.trade_member_money 	=	COALESCE(#{tradeMemberMoney},o.trade_member_money),
+			o.trade_cash 			=	COALESCE(#{tradeCash},o.trade_cash),
+			o.trade_wechat 			=	COALESCE(#{tradeWechat},o.trade_wechat),
+			o.trade_alipay 			=	COALESCE(#{tradeAlipay},o.trade_alipay),
+			o.trade_creditCard 		=	COALESCE(#{tradeCreditCard},o.trade_creditCard),
+			o.is_use_member			= 	COALESCE(#{isUseMember},o.is_use_member),
+			o.type_hypotaxis		=	COALESCE(#{typeHypotaxis},o.type_hypotaxis),
+			o.description			=	COALESCE(#{description},o.description),
+			o.discount_preferential_money			=	COALESCE(#{discountPreferentialMoney},o.discount_preferential_money),
+			o.sync_status          = 	COALESCE(#{sync_status},o.sync_status)
+										
+		WHERE o.id = #{id}
+
+	</update>
+
+	<update id="updateSyn_status" parameterType="Orders">
+		UPDATE
+			orders
+		SET
+			sync_status	=	1
+		WHERE
+			id = #{id}
+
+	</update>
+
+	<!--171103+:合并订单-->
+	<update id="unifyOrderNo">
+		UPDATE
+			orders
+		SET order_pno = ( SELECT o.order_no FROM ( SELECT order_no FROM orders WHERE dining_table_id = #{diningTablePid} and status_id = 0 ) o ),
+			type_hypotaxis = 1,
+			sync_status = 0
+		WHERE
+		dining_table_id IN(
+		<foreach collection="diningTableIdList" item="diningTableId" index="index" separator=",">
+			#{diningTableId}
+		</foreach>)
+		AND status_id = 0
+	</update>
+
+	<!--重置桌位合并状态-->
+	<update id="resetOrderPno">
+		UPDATE orders
+		SET order_pno = NULL,
+			type_hypotaxis = 0,
+			sync_status = 0
+		WHERE
+			shop_id = #{shopId} AND status_id=0
+	</update>
+
+	<!--171103+:结账之后置位桌位-->
+	<update id="resetDiningTable">
+		UPDATE
+			dining_table
+		SET
+			STATUS = 0,
+			sync_status = 0
+		WHERE
+			id IN(
+				SELECT
+					o2.dining_table_id
+				FROM
+					orders o2
+				WHERE
+					o2.order_pno = ( SELECT o1.order_no FROM orders o1 WHERE o1.id = #{id} ) or o2.id=#{id}
+			)
+	</update>
+
+
+	
+	<!-- 查询折扣金额 -->
+	<select id="selectDiscoutPreferential" resultType="double">
+		SELECT COALESCE(n11.sumDiscountPreferential,0)+COALESCE(n22.sumMemberDiscountPreferential,0)
+			FROM
+				<!-- #普通折扣优惠 -->
+				(SELECT sum(n1.oplDiscountPreferential) sumDiscountPreferential FROM(
+					SELECT p.price*opl.quantity*(1-o.discount) oplDiscountPreferential
+					FROM
+			
+							(SELECT id,is_discount,CASE is_promotion 
+								WHEN  0 THEN
+									unit_price
+								ELSE 
+									promotion_price
+							END  price FROM product)p,
+			
+							(SELECT id,discount FROM orders 
+													<trim prefix="WHERE" prefixOverrides="and">
+														is_use_member=0 AND discount IS NOT NULL AND status_id in(1,2)
+														<if test="shopId!=null">
+															and shop_id = #{shopId} 
+														</if>
+														<if test="startTime!=null">
+															and unix_timestamp(pay_time) between unix_timestamp(#{startTime}) and unix_timestamp(#{endTime})
+														</if>																	
+													</trim>															
+													<!-- WHERE  is_use_member=0 AND discount IS NOT NULL AND status_id in(1,2) -->															
+							) o,
+							order_product_log opl
+							
+							where opl.order_id = o.id and opl.product_id = p.id and p.is_discount = 1
+				)n1)n11		
+				<!-- #会员折扣优惠 -->		
+				,(SELECT 	sum(n2.oplMemberDiscountPreferential) sumMemberDiscountPreferential FROM(	
+					SELECT p.price*opl.quantity*(1-o.member_card_discount)  oplMemberDiscountPreferential
+					FROM
+			
+							(SELECT id,is_member_discount,CASE is_promotion 
+								WHEN  0 THEN
+									unit_price
+								ELSE 
+									promotion_price
+							END  price FROM product)p,
+							(SELECT id,member_card_discount FROM orders
+															<trim prefix="WHERE" prefixOverrides="and">
+																is_use_member=1 AND member_card_discount IS NOT NULL AND status_id in(1,2)
+																<if test="shopId!=null">
+																	and shop_id = #{shopId} 
+																</if>
+																<if test="startTime!=null">
+																	and unix_timestamp(pay_time) between unix_timestamp(#{startTime}) and unix_timestamp(#{endTime})
+																</if>																	
+															</trim>	 
+															<!-- WHERE  is_use_member=1 AND member_card_discount IS NOT NULL AND status_id in(1,2) -->
+
+							) o,
+							order_product_log opl 
+							
+							where opl.order_id = o.id and opl.product_id = p.id and p.is_member_discount = 1
+				)n2)n22
+				
+	</select>
+			
+	<!--1771120+:查询合并订单子订单ID集合-->
+	<select id="selectIdListByPId" resultType="Long">
+		SELECT 
+			id 
+		FROM (SELECT id FROM orders o2 WHERE o2.order_pno = ( SELECT o1.order_no FROM orders o1 WHERE o1.id = #{PId}))n
+	</select>
+
+	<!--171103+:select-->
+	<select id="selectByDiningTableAndStatusId" parameterType="Integer" resultType="Orders">
+		SELECT
+			id,
+			order_no,
+			order_pno orderPno,
+			shop_id,
+			serial_id,
+			dining_table_id,
+			table_runner,
+			create_time,
+			total_free,
+			real_pay,
+			pay_time,
+			back_time,
+			type_pay pay_type,
+			pay_person,
+			status_id,
+			description,
+			discount,
+			residue,
+			income,
+			odd,
+			service_charge,
+			member_id memberId,
+			member_identifier memberIdentifier,
+			member_card_name memberCardName,
+			member_card_discount memberCardDiscount,
+			trade_member_integral tradeMemberIntegral,
+			trade_member_money tradeMemberMoney,
+			trade_cash	tradeCash,
+			trade_wechat tradeWechat,
+			trade_alipay tradeAlipay,
+			trade_creditCard tradeCreditCard,
+			type_hypotaxis typeHypotaxis,
+			is_use_member isUseMember,
+		 	discount_preferential_money	discountPreferentialMoney,
+		 	sync_status
+		FROM 
+			orders
+		WHERE 
+			dining_table_id = #{diningTableId} and status_id = #{statusId}
+	</select>
+
+	<!--171103+:selectListById-->
+	<select id="selectListById" parameterType="Long" resultType="Orders">
+		SELECT
+			id,
+			order_no,
+			order_pno orderPno,
+			shop_id,
+			serial_id,
+			dining_table_id,
+			table_runner,
+			create_time,
+			total_free,
+			real_pay,
+			pay_time,
+			back_time,
+			type_pay pay_type,
+			pay_person,
+			status_id,
+			description,
+			discount,
+			residue,
+			income,
+			odd,
+			service_charge,
+			/*17/1103+*/
+			member_id memberId,
+			member_identifier memberIdentifier,
+			member_card_name memberCardName,
+			member_card_discount memberCardDiscount,
+			trade_member_integral tradeMemberIntegral,
+			trade_member_money tradeMemberMoney,
+			trade_cash	tradeCash,
+			trade_wechat tradeWechat,
+			trade_alipay tradeAlipay,
+		  	trade_creditCard tradeCreditCard,
+		  	type_hypotaxis typeHypotaxis,
+		  	is_use_member isUseMember,
+		  	discount_preferential_money	discountPreferentialMoney,
+		  	  sync_status
+		FROM orders
+		WHERE id = #{id} or order_pno = (SELECT order_no FROM orders WHERE  id = #{id})
+		ORDER BY type_hypotaxis
+	</select>
+
+	<!--selectList-->
+	<select id="selectList" resultType="Orders">
+		SELECT
+			id,
+			order_no,
+			order_pno orderPno,
+			shop_id,
+			serial_id,
+			dining_table_id,
+			table_runner,
+			create_time,
+			total_free,
+			real_pay,
+			pay_time,
+			back_time,
+			type_pay pay_type,
+			pay_person,
+			status_id,
+			description,
+			discount,
+			residue,
+			income,
+			odd,
+			service_charge,
+			/*17/1103+*/
+			member_id memberId,
+			member_identifier memberIdentifier,
+			member_card_name memberCardName,
+			member_card_discount memberCardDiscount,
+			trade_member_integral tradeMemberIntegral,
+			trade_member_money tradeMemberMoney,
+			trade_cash	tradeCash,
+			trade_wechat tradeWechat,
+			trade_alipay tradeAlipay,
+			trade_creditCard tradeCreditCard,
+			type_hypotaxis typeHypotaxis,
+			is_use_member isUseMember,
+			discount_preferential_money	discountPreferentialMoney,
+			sync_status
+		FROM
+				orders
+		<trim prefix="WHERE" prefixOverrides="and|or" >
+			type_hypotaxis = 0
+			<if test="shop_id!=null">
+				and shop_id = #{shop_id}
+			</if>
+			<if test="id!=null">
+				id = #{id}
+			</if>
+			<if test="dining_table_id!=null">
+				and dining_table_id = #{dining_table_id}
+			</if>
+			<if test="start_time!=null">
+				and unix_timestamp(pay_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})
+			</if>
+			
+			<if test="statusList!=null" >
+				and
+				<foreach collection="statusList"  item="status_id" index="index" separator="or" open="(" close=")">
+					status_id =  #{status_id}
+				</foreach>
+			</if>
+			<if test="typePay!=null" >
+				and type_pay = #{typePay}	
+			</if>
+			
+		 	ORDER BY create_time DESC
+			<if test="pageStart_index!=null">
+				 LIMIT #{pageStart_index},#{page_size}
+			</if>
+
+		</trim>
+	</select>
+
+
+	<select id="selectByDinigTableIdAndStatusId" resultType="Orders">
+		SELECT
+			id,
+			order_no,
+			order_pno orderPno,
+			shop_id,
+			serial_id,
+			dining_table_id,
+			table_runner,
+			create_time,
+			total_free,
+			real_pay,
+			pay_time,
+			back_time,
+			type_pay pay_type,
+			pay_person,
+			status_id,
+			description,
+			discount,
+			residue,
+			income,
+			odd,
+			service_charge,
+			/*17/1103+*/
+			member_id memberId,
+			member_identifier memberIdentifier,
+			member_card_name memberCardName,
+			member_card_discount memberCardDiscount,
+			trade_member_integral tradeMemberIntegral,
+			trade_member_money tradeMemberMoney,
+			trade_cash	tradeCash,
+			trade_wechat tradeWechat,
+			trade_alipay tradeAlipay,
+			trade_creditCard tradeCreditCard,
+			type_hypotaxis typeHypotaxis,
+			is_use_member isUseMember,
+			discount_preferential_money	discountPreferentialMoney,
+			sync_status
+		FROM
+		orders
+		<trim prefix="WHERE" prefixOverrides="and|or" >
+			type_hypotaxis = 0
+			<if test="shop_id!=null">
+				and shop_id = #{shop_id}
+			</if>
+			<if test="id!=null">
+				id = #{id}
+			</if>
+			<if test="dining_table_id!=null">
+				and dining_table_id = #{dining_table_id}
+			</if>
+			<if test="start_time!=null">
+				and unix_timestamp(pay_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})
+			</if>
+
+			<if test="statusList!=null" >
+				and
+				<foreach collection="statusList"  item="status_id" index="index" separator="or" open="(" close=")">
+					status_id =  #{status_id}
+				</foreach>
+			</if>
+			ORDER BY create_time DESC
+			<if test="pageStart_index!=null">
+				LIMIT #{pageStart_index},#{page_size}
+			</if>
+
+		</trim>
+	</select>
+
+	<select id="getOrdersCount" resultType="OrderCount">
+		SELECT 				
+			count(*) payType_num,											
+			SUM(real_pay) payType_money,
+			SUM(total_free) payType_money_total,
+			SUM(residue) payType_residue,
+			type_pay pay_type
+		FROM orders
+		<trim prefix="WHERE" suffixOverrides="and" >
+			shop_id = #{shop_id} and type_hypotaxis = 0
+			<if test="start_time!=null">
+				and unix_timestamp(pay_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})
+			</if>
+			<if test="statusList!=null">
+				and
+				<foreach collection="statusList"  item="status_id" index="index" separator="or" open="(" close=")">
+					status_id =  #{status_id}	
+				</foreach>			
+			</if>
+
+			GROUP BY type_pay
+			ORDER BY type_pay asc
+		</trim>
+	</select>
+	
+	<!-- 17-11-23+ -->
+	<select id="getOrderPayCount" resultType="OrdersCountModel">
+		SELECT
+			count(*) totalNum,
+			COALESCE(sum( trade_cash ),0.00) sumTradeCash,
+			COALESCE(sum( trade_wechat ),0.00) sumTradeWechat,
+			COALESCE(sum( trade_alipay ),0.00) sumTradeAlipay,
+			COALESCE(sum( trade_creditCard ),0.00) sumTradeCreditCard,
+			COALESCE(sum(trade_member_money),0.00) sumMemberConsume,
+			COALESCE(sum(discount_preferential_money),0.00) sumDiscountPreferential,
+			COALESCE(SUM(residue),0.00) sumResidue	
+		FROM
+		orders	
+		<trim prefix="WHERE" suffixOverrides="and" >
+			shop_id = #{shop_id} 
+				and type_hypotaxis = 0 and type_pay!=120 and type_pay!=130 and status_id =1
+			<if test="start_time!=null">
+				and unix_timestamp(pay_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})
+			</if>
+		</trim>	
+		
+	</select>
+	
+	<select id="selectByIsUpload" resultType="Orders">
+		SELECT
+			id,
+			order_no,
+			order_pno orderPno,
+			shop_id,
+			serial_id,
+			dining_table_id,
+			table_runner,
+			create_time,
+			total_free,
+			real_pay,
+			pay_time,
+			back_time,
+			type_pay pay_type,
+			pay_person,
+			status_id,
+			description,
+			discount,
+			residue,
+			income,
+			odd,
+			service_charge,
+			member_id memberId,
+			member_identifier memberIdentifier,
+			member_card_name memberCardName,
+			member_card_discount memberCardDiscount,
+			trade_member_integral tradeMemberIntegral,
+			trade_member_money tradeMemberMoney,
+			trade_cash	tradeCash,
+			trade_wechat tradeWechat,
+			trade_alipay tradeAlipay,
+			trade_creditCard tradeCreditCard,
+			type_hypotaxis typeHypotaxis,
+			is_use_member isUseMember,
+			discount_preferential_money	discountPreferentialMoney,
+			sync_status
+		FROM 
+			orders
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+
+	
+</mapper>

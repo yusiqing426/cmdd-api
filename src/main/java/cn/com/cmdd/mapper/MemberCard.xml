@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.MemberCardDao">
+
+	<insert id="insert" parameterType="MemberCard">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT
+		INTO member_card(
+			id,
+			shop_id,
+			name,
+			discount,
+			sync_status
+			)
+		VALUES(
+			#{id},
+			#{shopId},
+			#{name},
+			#{discount},
+			#{sync_status}
+		)
+	</insert>
+
+	<insert id="insertById" parameterType="MemberCard">
+		INSERT INTO member_card(
+			id,
+			shop_id,
+			name,
+			discount,
+			sync_status
+			)
+		VALUES(
+			#{id},
+			#{shopId},
+			#{name},
+			#{discount},
+			COALESCE(#{sync_status},sync_status)
+		)
+		ON DUPLICATE KEY
+		UPDATE
+			shop_id = #{shopId},
+			name = #{name},
+			discount = #{discount},
+			sync_status = #{sync_status}
+	</insert>
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="MemberCard">
+		SELECT 
+			id,
+			shop_id shopId,
+			name,
+			discount,
+			sync_status
+		FROM 
+			Member_Card
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+	
+	<!--<update id="updateIsUpload">
+		UPDATE 
+			Member_Card
+		SET 
+			is_upload = 1
+		WHERE
+			id = #{0}
+	</update>-->
+
+</mapper>
+
+
+
+
+ 

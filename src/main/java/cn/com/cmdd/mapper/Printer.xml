@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.PrinterDao">
+
+	<insert id="savePrinter" parameterType="Printer">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT INTO 
+			printer(
+				id,
+				shop_id,
+				printer_type,
+				name,
+				page_width,
+				sync_status
+		)VALUES(
+				#{id},
+				#{shop_id},
+				#{printer_type},
+				#{name},
+				#{page_width},
+				#{sync_status}
+		)
+	</insert>
+
+	<insert id="insertById" parameterType="Printer">
+		INSERT INTO
+			printer(
+				id,
+				shop_id,
+				printer_type,
+				name,
+				page_width,
+				sync_status
+		  	)VALUES(
+				#{id},
+				#{shop_id},
+				#{printer_type},
+				#{name},
+				#{page_width},
+				#{sync_status}
+		  	)ON DUPLICATE KEY
+		  	UPDATE
+				shop_id		  = #{shop_id}		,
+				printer_type  = #{printer_type}	,
+				name 		  = #{name}			,
+				page_width	  = #{page_width}	,
+			 	sync_status	  = #{sync_status}
+	</insert>
+
+
+	<delete id="deletePrinter" parameterType="Integer">
+		DELETE	
+		FROM
+		  printer
+		WHERE
+		  id=#{id}
+	</delete>
+		
+	<update id="updatePrinter" parameterType="Printer">
+		UPDATE
+            printer
+		SET  
+            shop_id		  =	COALESCE(#{shop_id},shop_id),
+            printer_type  =	COALESCE(#{printer_type},printer_type),
+			name 		  =	COALESCE(#{name},name),
+			page_width	  = COALESCE(#{page_width},page_width),
+			sync_status	  = COALESCE(#{sync_status},sync_status)
+		WHERE id=#{id}
+	</update>
+	
+	<select id="getPrinter" resultType="Printer">
+		SELECT 
+			id,
+            shop_id,
+            printer_type,
+            name,
+            page_width,
+            sync_status
+		FROM
+            printer
+            <trim prefix="WHERE" >
+                <if test="shop_id!=null">
+                    shop_id=#{shop_id}
+                </if>
+                <if test="id!=null">
+                    id=#{id}
+                </if>
+            </trim>
+		    ORDER BY id ASC
+	</select>
+	
+	<select id="getPrinterNameByPrinter_type" parameterType="Integer" resultType="Printer">
+		SELECT 
+			id,
+			shop_id,
+			printer_type,
+			name,
+			page_width,
+		    sync_status
+		FROM 
+			printer
+		<trim prefix="WHERE" prefixOverrides="and" >
+			<if test="shop_id!=null">
+				shop_id=#{shop_id}
+			</if>
+			<if test="printer_type!=null">
+				and printer_type=#{printer_type}
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Printer">
+		SELECT 
+			id,
+			shop_id,
+			printer_type,
+			name,
+			page_width,
+			sync_status
+		FROM 
+			Printer
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+
+</mapper>

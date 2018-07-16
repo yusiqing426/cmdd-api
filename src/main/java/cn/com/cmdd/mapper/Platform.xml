@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.PlatformDao">
+	
+	<!-- 得到平台管理者 -->
+	<select id="getPlatformById" parameterType="int" resultType="Platform">
+		select id,account,password from platform where id = #{0}
+	</select>
+	
+	<!-- 修改平台管理员的密码 -->
+	<update id="updatePlatformPassword">
+		UPDATE platform 
+		SET password = #{1}
+		WHERE id = #{0}
+	</update>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

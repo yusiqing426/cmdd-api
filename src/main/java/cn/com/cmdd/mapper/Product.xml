@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.ProductDao">
+	<insert id="insert" parameterType="Product">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT
+		INTO product(
+				id,
+				shop_id,
+				category_id,
+				logo_id,
+				name,
+				unit_price,
+				is_promotion,
+				is_in_use,
+				is_auto,
+				is_discount,
+				promotion_price,
+				unit,
+				is_member_discount,
+				is_member_integral,
+				is_use_member_price,
+				member_price,
+				description,
+				sync_status
+		)
+		VALUES(
+			COALESCE(#{id},UUID_SHORT()),
+			#{shop_id},
+			#{category_id},
+			#{logo_id},
+			#{name},
+			#{unit_price},
+			#{is_promotion},
+			#{is_in_use},
+			#{is_auto},
+			#{is_discount},
+			#{promotion_price},
+			#{unit},
+			#{isMemberDiscount},
+			#{isMemberIntegral},
+			#{isUseMemberPrice},
+			#{memberPrice},
+			#{description},
+			#{sync_status}
+		)
+	</insert>
+
+	<insert id="insertById" parameterType="Product">
+		INSERT INTO
+			product(
+				id			,
+				shop_id,
+				category_id,
+				logo_id,
+				name,
+				unit_price,
+				is_promotion,
+				is_in_use,
+				is_auto,
+				is_discount,
+				promotion_price,
+				unit,
+				is_member_discount,
+				is_member_integral,
+				is_use_member_price	,
+				member_price,
+				description,
+				sync_status
+			)VALUES(
+				#{id},
+				#{shop_id},
+				#{category_id},
+				#{logo_id},
+				#{name},
+				#{unit_price},
+				#{is_promotion},
+				#{is_in_use},
+				#{is_auto},
+				#{is_discount},
+				#{promotion_price},
+				#{unit},
+				#{isMemberDiscount},
+				#{isMemberIntegral},
+				#{isUseMemberPrice},
+				#{memberPrice},
+				#{description},
+				#{sync_status}
+			)
+			ON DUPLICATE KEY
+			UPDATE
+				 shop_id			=	#{shop_id}			,
+				 category_id		=	#{category_id}		,
+				 logo_id			=	#{logo_id}			,
+				 name				=	#{name}				,
+				 unit_price			=	#{unit_price}		,
+				 is_promotion		=	#{is_promotion}		,
+				 is_in_use			=	#{is_in_use}		,
+				 is_auto			=	#{is_auto}			,
+				 is_discount		=	#{is_discount}		,
+				 promotion_price	=	#{promotion_price}	,
+				 unit				=	#{unit}				,
+				 is_member_integral	=	#{isMemberIntegral}	,
+				 is_member_discount	=	#{isMemberDiscount}	,
+				 is_use_member_price=	#{isUseMemberPrice}	,
+				 member_price		=	#{memberPrice}		,
+				 description		=	#{description}		,
+				 sync_status 		= 	#{sync_status}
+	</insert>
+	
+	<delete id="delete" parameterType="Long">
+		DELETE	
+		FROM product
+		WHERE id= #{id} 
+	</delete>
+		
+	<update id="update" parameterType="Product">
+		UPDATE 
+			product 
+		SET  
+			shop_id				=	COALESCE(#{shop_id},shop_id)						,
+			category_id			=	COALESCE(#{category_id},category_id)				,
+			logo_id				=	COALESCE(#{logo_id},logo_id)						,
+			name				=	COALESCE(#{name},name)								,
+			unit_price			=	COALESCE(#{unit_price},unit_price)					,
+			is_promotion		=	COALESCE(#{is_promotion},is_promotion)				,
+			is_in_use			=	COALESCE(#{is_in_use},is_in_use)					,
+			is_auto				=	COALESCE(#{is_auto},is_auto)						,
+			is_discount			=	COALESCE(#{is_discount},is_discount)				,
+			promotion_price		=	COALESCE(#{promotion_price},promotion_price)		,
+			unit				=	COALESCE(#{unit},unit)								,
+			is_member_integral	=	COALESCE(#{isMemberIntegral},is_member_integral)	,
+			is_member_discount	=	COALESCE(#{isMemberDiscount},is_member_discount)	,
+			is_use_member_price	=	COALESCE(#{isUseMemberPrice},is_use_member_price)	,
+			member_price		=	COALESCE(#{memberPrice},member_price)				,
+			description			=	COALESCE(#{description},description)				,
+			sync_status 		= 	COALESCE(#{sync_status},sync_status)
+		WHERE 
+			id=#{id}
+	</update>
+
+	<select id="select" resultType="Product">
+		SELECT
+			p.id,
+			p.shop_id,
+			p.category_id,
+			c.name category_name,
+			p.logo_id,
+			p.name,
+			p.unit_price,
+			p.is_promotion,
+			p.is_in_use,
+			p.is_auto,
+			p.is_discount,
+			p.promotion_price,
+			p.unit,
+			p.is_member_integral isMemberIntegral,
+			p.is_member_discount isMemberDiscount,
+			p.is_use_member_price isUseMemberPrice,
+			p.member_price	memberPrice,
+			p.description,
+			p.sync_status
+		FROM product p
+			JOIN category c
+		ON p.category_id=c.id
+		WHERE p.id=#{id}
+	</select>
+
+	<select id="selectListByShopIdAndIdAndCategoryId" resultType="Product">
+		SELECT
+			p.id,
+			p.shop_id,
+			p.category_id,
+				c.name category_name,
+			p.logo_id,
+			p.name,
+			p.unit_price,
+			p.is_promotion,
+			p.is_in_use,
+			p.is_auto,
+			p.is_discount,
+			p.promotion_price,
+			p.unit,
+			p.is_member_integral isMemberIntegral,
+			p.is_member_discount isMemberDiscount,
+			p.is_use_member_price isUseMemberPrice,
+			p.member_price	memberPrice,
+			p.description,
+			p.sync_status
+		FROM product p
+			JOIN category c
+		ON p.category_id=c.id  
+		<trim prefix="WHERE" prefixOverrides="and">
+			<if test="shop_id!=null">
+				p.shop_id=#{shop_id}
+			</if>
+			<if test="id!=null">
+				p.id=#{id}
+			</if>
+			<if test="category_id!=null">
+			  	c.id=#{category_id}
+			</if>
+		</trim>
+		ORDER BY p.id ASC
+	</select>
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Product">
+		SELECT 
+			id,
+			shop_id,
+			category_id,
+			logo_id,
+			name,
+			unit,
+			unit_price,
+			is_promotion,
+			is_in_use,
+			is_auto,
+			is_discount,
+			promotion_price,
+			is_member_discount isMemberDiscount,
+			is_member_integral isMemberIntegral,
+			is_use_member_price isUseMemberPrice,
+			member_price memberPrice,
+			description,
+			sync_status
+		FROM 
+			product
+		WHERE 
+			shop_id = #{0} And sync_status=0
+	</select>
+</mapper>

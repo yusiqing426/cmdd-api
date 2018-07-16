@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.IPDao">
+	
+	<select id="select" resultType="IP">
+		SELECT 
+			shop_id shopId,
+			local_area_network localAreaNetwork 
+		FROM 
+			ip
+		WHERE 
+			shop_id = #{0}	
+	</select>
+
+</mapper>
+
+
+
+
+ 

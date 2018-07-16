@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.MemberRechargeLogDao">
+
+	<insert id="addMemberRechargeLog" parameterType="MemberRechargeLog">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT	INTO
+			member_recharge_log(
+				id,
+				member_id,
+				shop_id,
+				amount,
+				pay_type,
+				now_balance,
+				give_amount,
+				create_time,
+				trade_integral,
+				integral,
+				category,
+				type,
+				description,
+				sync_status
+			)
+		VALUES (
+			COALESCE(#{id},UUID_SHORT()),
+				#{member_id},
+				#{shop_id},
+				#{amount},
+				#{pay_type},
+				#{now_balance},
+				#{giveAmount},
+				COALESCE(#{create_time},now()),
+				#{tradeIntegral},
+				#{integral},
+				#{category},
+				#{type},
+				#{description},
+				#{sync_status}
+		)
+	</insert>
+
+	<insert id="insertById" parameterType="Member">
+		INSERT
+			INTO
+			member_recharge_log(
+				id,
+				member_id,
+				shop_id,
+				amount,
+				pay_type,
+				now_balance,
+				give_amount,
+				create_time,
+				trade_integral,
+				integral,
+				category,
+				type,
+				description,
+				sync_status
+			)
+		VALUES (
+			COALESCE(#{id},UUID_SHORT()),
+			#{member_id},
+			#{shop_id},
+			#{amount},
+			#{pay_type},
+			#{now_balance},
+			#{giveAmount},
+			COALESCE(#{create_time},now()),
+			#{tradeIntegral},
+			#{integral},
+			#{category},
+			#{type},
+			#{description},
+			COALESCE(#{sync_status},sync_status)
+		)
+
+		ON DUPLICATE KEY
+		UPDATE
+			member_id 	= 	COALESCE(#{member_id},member_id)		,
+			shop_id 	= 	COALESCE(#{shop_id},shop_id)			,
+			amount		=	COALESCE(#{amount},amount)				,
+			give_amount = 	COALESCE(#{giveAmount},give_amount)		,
+			pay_type	=	COALESCE(#{pay_type},pay_type)			,
+			sync_status	=	COALESCE(#{sync_status},sync_status)	,
+			now_balance	=	COALESCE(#{now_balance},now_balance)
+
+	</insert>
+
+
+	<update id="updateMemberRechargeLog" parameterType="MemberRechargeLog">
+		UPDATE
+				member_recharge_log
+			SET
+				member_id 	= 	COALESCE(#{member_id},member_id)		,
+				shop_id 	= 	COALESCE(#{shop_id},shop_id)			,
+				amount		=	COALESCE(#{amount},amount)				,
+				give_amount = 	COALESCE(#{giveAmount},give_amount)		,
+				pay_type	=	COALESCE(#{pay_type},pay_type)			,
+				sync_status	=	#{sync_status}	,
+				now_balance	=	COALESCE(#{now_balance},now_balance)
+		WHERE
+				id = #{id}
+	</update>
+	
+	<select id="getMemberRechargeLogListByMember" resultType="MemberRechargeLog">
+		SELECT  mrl.id,
+				mrl.shop_id,
+				mrl.member_id,
+				mrl.amount,
+				mrl.pay_type,
+				mrl.now_balance,
+				mrl.create_time,
+				/*171108+*/
+				mrl.trade_integral tradeIntegral,
+				mrl.integral,
+				mrl.category,
+				mrl.type,
+				mrl.description,
+				/*------*/
+				m.phone AS phone,
+				m.balance AS balance,
+				m.name AS name,
+				m.sex AS sex
+		FROM member_recharge_log AS mrl INNER JOIN member AS m ON mrl.member_id = m.id
+		<trim prefix="WHERE" prefixOverrides="and|or" suffixOverrides=",">
+			mrl.member_id = #{member_id}
+			<if test="category!=null">
+				mrl.category = #{category}
+			</if>
+			<if test="type!=null">
+				mrl.type = #{type}
+			</if>
+		</trim>
+		ORDER BY mrl.id
+	</select>
+	
+	<select id="getMemberRechargeLogListByShop_id" resultType="MemberRechargeLog">
+		SELECT  mrl.id,
+				mrl.shop_id,
+				mrl.member_id,
+				mrl.amount,
+				mrl.pay_type,
+				mrl.now_balance,
+				mrl.create_time,
+				/*171108+*/
+				mrl.trade_integral tradeIntegral,
+				mrl.integral,
+				mrl.category,
+				mrl.type,
+				mrl.description,
+				/*------*/
+				m.phone AS phone,
+				m.balance AS balance,
+				m.name AS name,
+				m.sex AS sex
+		FROM member_recharge_log AS mrl INNER JOIN member AS m ON mrl.member_id = m.id
+		WHERE mrl.shop_id = #{0}
+		ORDER BY mrl.id
+	</select>
+	
+	<select id="getMemberAmount" resultType="Double">
+		SELECT sum(amount)
+		FROM (select * from member_recharge_log where type=11)n
+		<trim prefix="where" prefixOverrides="and|or">
+			shop_id = #{shop_id}
+			<if test="start_time">
+				and unix_timestamp(create_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})		
+			</if>
+		</trim>		
+	</select>
+	
+	<select id="getMemberGiveAmount" resultType="Double">
+		SELECT sum(give_amount)
+		FROM (select * from member_recharge_log where type=11)n
+		<trim prefix="where" prefixOverrides="and|or">
+			shop_id = #{shop_id}
+			<if test="start_time">
+				and unix_timestamp(create_time) between unix_timestamp(#{start_time}) and unix_timestamp(#{end_time})		
+			</if>
+		</trim>		
+	</select>
+
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="MemberRechargeLog">
+		SELECT 
+			id,
+			member_id,
+			shop_id,
+			amount,
+			pay_type,
+			create_time,
+			now_balance,
+			trade_integral trade_integral,
+			integral,
+			type,
+			description,
+			give_amount giveAmount,
+			sync_status
+		FROM 
+			Member_Recharge_Log
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+</mapper>
+
+
+
+
+ 

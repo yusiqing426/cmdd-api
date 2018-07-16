@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<excels>
+	<!-- demo -->
+		<!-- <field name="id" title="ID"/>
+			<field name="name" title="学生姓名"/>
+			<field name="age" title="年龄" isNull="false" regex="^[1-9]\d*$" regexErrMsg="必须是数字"/>
+			<field name="studentNo" title="学号" isNull="false" />
+			<field name="createTime" title="创建时间" pattern="yyyy-MM-dd,yyyy/MM/dd"/>
+			<field name="status" title="状态" format="1:正常,0:禁用,-1:无效" />
+			<field name="createUser" title="创建人"/>
+			复杂对象:
+			<field name="book.bookName" title="图书名称" />
+			<field name="book.author.authorName" title="作者名称"/> -->
+	<excel id="OrdersModel" class="cn.com.cmdd.domain.Orders">		
+		<field name="order_no" title="订单编号"/>	
+		<field name="serial_id" title="桌位编号"/>
+		<field name="table_runner" title="开桌人"/>
+		<field name="create_time" title="开桌时间" pattern="yyyy-MM-dd HH:mm:ss,yyyy/MM/dd HH:mm:ss"/>
+		<field name="total_free" title="应付金额"/>
+		<field name="real_pay" title="实付金额" />
+		<field name="pay_time" title="结账时间" pattern="yyyy-MM-dd HH:mm:ss,yyyy/MM/dd HH:mm:ss"/>
+		<field name="back_time" title="退单时间" pattern="yyyy-MM-dd HH:mm:ss,yyyy/MM/dd HH:mm:ss"/>
+		<field name="pay_type" title="付款方式" format="111:现金,112:银行卡,113:微信,114:支付宝,115:会员卡,116:组合付款,120:免单,130:挂账,210:退单"/>
+		<field name="pay_person" title="结账人"/>
+	</excel>
+	
+	<excel id="ProductCountModel" class="cn.com.cmdd.domain.ProductCount">
+		<field name="name" title="菜品名"></field>
+		<field name="category_name" title="菜品类别名"></field>
+		<field name="sumCount" title="菜品总数"></field>
+	
+	</excel>
+</excels>

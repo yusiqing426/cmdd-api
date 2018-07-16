@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.AgentDao">
+	
+	<select id="getAgentList" resultType="Agent">
+		select * from agent
+	</select>
+
+	<insert id="addAgent" parameterType="Agent" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO 
+			agent(
+					name,
+					company_name,
+					sex,
+					account,
+					phone,id_card,
+					company_address,
+					password,
+					is_in_use,
+					payable_expenses,
+					payable_date,
+					create_time,
+					last_login_time,
+					service_charge
+				) 
+		VALUES (
+					#{name},
+					#{company_name},
+					#{sex},
+					#{account},
+					#{phone},
+					#{id_card},
+					#{company_address},
+					#{password},
+					#{is_in_use},
+					#{payable_expenses},
+					#{payable_date},
+					now(),
+					now(),
+					#{service_charge}
+				)
+	</insert>
+	
+	<select id="getAgentById" resultType="Agent" parameterType="int">
+		select 
+			id,
+			name,
+			company_name,sex,
+			account,
+			phone,
+			id_card,
+			company_address,
+			password,
+			is_in_use,
+			payable_expenses,
+			payable_date,
+			create_time,
+			last_login_time,			
+			service_charge 
+		FROM 
+			agent 
+		WHERE 
+			id = #{0}
+	</select>
+	
+	<update id="updateAgent" parameterType="Agent">
+		UPDATE 
+			agent a 
+				LEFT JOIN 
+					shop s 
+				ON 
+					a.id = s.agent_id AND s.is_use_service = 1 
+		SET 
+			a.name = COALESCE(#{name},a.name),
+			a.company_name = COALESCE(#{company_name},a.company_name),
+			a.sex=COALESCE(#{sex},a.sex),
+			a.account=COALESCE(#{account},a.account),
+			a.phone = COALESCE(#{phone},a.phone),
+			a.id_card=COALESCE(#{id_card},a.id_card),
+			a.company_address=COALESCE(#{company_address},a.company_address),
+			a.password = COALESCE(#{password},a.password),
+			a.is_in_use=COALESCE(#{is_in_use},a.is_in_use),
+			a.payable_expenses=COALESCE(#{payable_expenses},a.payable_expenses),
+			a.payable_date=COALESCE(#{payable_date},a.payable_date),
+			a.last_login_time=COALESCE(#{last_login_time},a.last_login_time),
+			a.service_charge = COALESCE(#{service_charge},a.service_charge),
+			s.service_charge = COALESCE(#{service_charge},s.service_charge)
+		WHERE
+			a.id = #{id}				
+	</update>
+	
+	<update id="updatePlatformPassword">
+		UPDATE platform
+		SET password = COALESCE(#{1},password)
+		WHERE id = #{0}
+	</update>
+</mapper>
+
+
+
+
+ 

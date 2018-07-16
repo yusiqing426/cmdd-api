@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.Call_serviceDao">
+	<insert id="saveCall_service" parameterType="Call_service" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO 
+			call_service(
+				id,order_id,dining_table_id,serial_id,shop_id,service_type,description,create_time
+			)VALUES(
+				#{id},
+				#{order_id},
+				#{dining_table_id},
+				#{serial_id},
+				#{shop_id},
+				#{service_type},
+				#{description},
+				now()
+			)
+	</insert>
+	
+	<delete id="deleteCall_service" parameterType="Integer">
+		DELETE	
+		FROM 
+			call_service
+		WHERE 
+			id=#{id} 
+	</delete>
+	
+	<delete id="deleteByOrderId" parameterType="Integer">
+		DELETE	
+		FROM 
+			call_service
+		WHERE 
+			order_id=#{order_id} 
+	</delete>
+	
+	<delete id="deleteByDiningTableId" parameterType="Integer">
+		DELETE	
+		FROM 
+			call_service
+		WHERE 
+			dining_table_id=#{dining_table_id} 
+	</delete>
+				
+	<select id="getCall_service" resultType="Call_service">
+		SELECT	
+			id,order_id,dining_table_id,serial_id,shop_id,service_type,description,create_time
+		FROM 
+			call_service
+		WHERE 
+			shop_id=#{shop_id}
+		ORDER BY 
+			create_time
+	</select>
+	
+	<update id="updateCall_service">
+		UPDATE 
+			call_service
+		SET
+			order_id 			= 	COALESCE(#{order_id},order_id),
+			dining_table_id 	= 	COALESCE(#{dining_table_id},dining_table_id),
+			serial_id 			= 	COALESCE(#{serial_id},serial_id),
+			shop_id 			= 	COALESCE(#{shop_id},shop_id),
+			service_type 		= 	COALESCE(#{service_type},service_type),
+			description 		= 	COALESCE(#{description},description),
+			create_time 		= 	COALESCE(#{create_time},create_time)
+		WHERE
+			id = #{id}	
+	</update>
+</mapper>

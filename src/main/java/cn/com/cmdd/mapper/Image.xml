@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.ImageDao">
+
+	<insert id="insert" parameterType="Image">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT INTO 
+			images(
+				id,
+				origin_name, 
+				file_size, 
+				create_time,
+				sync_status,
+				shop_id
+				)
+		VALUES (
+				#{id},
+				#{origin_name}, 
+				#{file_size},
+				now(),
+				#{sync_status},
+				#{shopId}
+				)
+	</insert>
+	
+	
+	<insert id="insertById" parameterType="Image">
+		INSERT INTO 
+			images(
+				id				,
+				origin_name		,
+				file_size		,
+				create_time		,
+				sync_status		,
+				shop_id
+				)
+		VALUES (
+				#{id}			,
+				#{origin_name}	,
+				#{file_size}	,
+				#{create_time}	,
+				#{sync_status}	,
+				#{shopId}
+				)
+			ON DUPLICATE KEY
+			UPDATE
+				origin_name	=	#{origin_name}	,
+				file_size	=	#{file_size}	,
+				sync_status	=	#{sync_status}	,
+				shop_id 	=	#{shopId},
+				create_time =   #{create_time}
+	</insert>
+
+	<delete id="delete">
+		DELETE FROM
+			images
+		WHERE
+			id=#{0}
+	</delete>
+
+	<update id="update">
+		UPDATE
+			images
+		SET
+			origin_name	=	COALESCE(#{origin_name},origin_name) 	,
+			file_size	=	COALESCE(#{file_size},file_size)		,
+			sync_status	=	COALESCE(#{sync_status},sync_status)	,
+			shop_id 	=	COALESCE(#{shopId},shop_id)
+		WHERE id = #{id}
+	</update>
+
+    <update id="updateSync_status">
+        UPDATE
+          images
+        SET
+          sync_status	=	1
+        WHERE
+          id = #{id}
+    </update>
+
+
+	<select id="select" resultType="Image">
+		SELECT
+			id				,
+			origin_name		,
+			file_size		,
+			sync_status		,
+			create_time     ,
+			shop_id shopId
+		FROM
+			images
+		WHERE
+			id = #{0}
+	</select>
+	
+
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Image">
+		SELECT 
+			id, 
+			origin_name, 
+			file_size,
+			shop_id shopId,
+			create_time,
+			sync_status
+		FROM 
+			Images
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+	
+</mapper>

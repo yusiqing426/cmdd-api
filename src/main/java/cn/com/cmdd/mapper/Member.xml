@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.MemberDao">
+
+	<insert id="addMember" parameterType="Member">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+			SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+		INSERT
+		INTO
+			member(
+				id,
+				shop_id,
+				member_card_id,
+				phone,
+				name,
+				sex,
+				birthday,
+				balance,
+				integral,
+				is_in_use,
+				pay_password,
+				sync_status
+			)
+		VALUES(
+			  COALESCE(#{id},UUID_SHORT()),
+			  #{shop_id},
+			  #{memberCardId},
+			  #{phone},
+			  #{name},
+			  #{sex},
+			  #{birthday},
+			  #{balance},
+			  COALESCE(#{integral},0),
+			  #{is_in_use},
+			  #{pay_password},
+			  #{sync_status}
+			  )
+	</insert>
+
+	<insert id="insertById" parameterType="Member">
+		INSERT
+		INTO
+			member(
+				id,
+				shop_id,
+				member_card_id,
+				phone,
+				name,
+				sex,
+				birthday,
+				balance,
+				integral,
+				is_in_use,
+				pay_password,
+				sync_status
+			)
+		VALUES(
+			  COALESCE(#{id},UUID_SHORT()),
+			  #{shop_id},
+			  #{memberCardId},
+			  #{phone},
+			  #{name},
+			  #{sex},
+			  #{birthday},
+			  #{balance},
+			  COALESCE(#{integral},0),
+			  #{is_in_use},
+			  #{pay_password},
+			  COALESCE(#{sync_status},sync_status)
+			  )
+
+		ON DUPLICATE KEY
+		UPDATE
+			shop_id			=	COALESCE(#{shop_id},shop_id),/*转卡*/
+			member_card_id	=	COALESCE (#{memberCardId},member_card_id),
+			pay_password 	= 	COALESCE (#{pay_password},pay_password),
+			phone 			= 	COALESCE(#{phone},phone),/*转卡*/
+			name 			= 	COALESCE(#{name},name),
+			sex				=	COALESCE(#{sex},sex),
+			birthday		=	COALESCE(#{birthday},birthday),
+			balance 		= 	COALESCE(#{balance},balance),
+			integral		= 	COALESCE(#{integral},integral),
+			sync_status		= 	COALESCE(#{sync_status},sync_status),
+			is_in_use		=	COALESCE(#{is_in_use},is_in_use)
+
+	</insert>
+
+	<!--修改基础信息-->
+	<update id="updateMember" parameterType="Member">
+		UPDATE
+			member
+		SET
+			shop_id			=	COALESCE(#{shop_id},shop_id),/*转卡*/
+			member_card_id	=	COALESCE (#{memberCardId},member_card_id),
+			phone 			= 	COALESCE(#{phone},phone),/*转卡*/
+			name 			= 	COALESCE(#{name},name),
+			sex				=	COALESCE(#{sex},sex),
+			birthday		=	COALESCE(#{birthday},birthday),
+			balance 		= 	COALESCE(#{balance},balance),
+			integral		= 	COALESCE(#{integral},integral),
+			sync_status 	=	COALESCE(#{sync_status},sync_status),
+			is_in_use		=	COALESCE(#{is_in_use},is_in_use),
+			pay_password	=	COALESCE(#{pay_password},pay_password)
+		WHERE id = #{id}
+	</update>
+
+	<!--修改密码-->
+	<update id="updateMemberPassword">
+		UPDATE
+			member
+		SET
+			pay_password = COALESCE(#{1},pay_password)
+		WHERE id = #{0}
+	</update>
+
+	<delete id="deleteMember">	
+		DELETE
+		FROM
+			member
+		WHERE
+			id = #{id}
+	</delete>
+
+    <select id="getMemberById" parameterType="int" resultType="Member">
+
+        select	m.id,
+        m.shop_id,
+        member_card_id memberCardId,
+        mc.name memberCardName,
+        mc.discount memberCardDiscount,
+
+        m.phone,
+        m.name,
+        m.sex,
+        m.birthday,
+        m.balance,
+        m.integral,
+        m.is_in_use,
+        m.pay_password,
+        m.sync_status
+        FROM member m JOIN member_card mc ON mc.id=m.member_card_id
+        WHERE m.id = #{0}
+    </select>
+
+    <select id="getMemberListByShop_id" parameterType="int" resultType="Member">
+        SELECT 	m.id,
+        m.shop_id,
+        m.member_card_id memberCardId,
+        mc.name memberCardName,
+        mc.discount memberCardDiscount,
+
+        m.phone,
+        m.name,
+        m.sex,
+        m.birthday,
+        m.balance,
+        m.integral,
+        m.is_in_use,
+        m.pay_password,
+        m.sync_status
+        FROM member m JOIN member_card mc ON mc.id=m.member_card_id
+        WHERE m.shop_id = #{0};
+    </select>
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Member">
+		SELECT 
+			id,
+			shop_id,
+			member_card_id memberCardId,
+			phone,
+			name,
+			sex,
+			birthday,
+			is_in_use,
+			pay_password,
+			balance,
+			integral,
+			sync_status
+		FROM 
+			Member
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+
+
+	<select id="birth" resultType="Member">
+		SELECT
+			id,
+			shop_id,
+			member_card_id memberCardId,
+			phone,
+			name,
+			sex,
+			birthday,
+			is_in_use,
+			pay_password,
+			balance,
+			integral,
+			sync_status
+		FROM
+			Member
+		WHERE
+			shop_id = #{0} and birthday = (INTERVAL #{1} DAY + curdate())
+	</select>
+
+</mapper>
+
+
+
+
+ 

@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.ShopDao">
+
+	
+	<insert id="addShop" parameterType="Shop" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO 
+			shop(
+					id,
+					agent_id,
+					pay_code_id,
+					name,
+					account,
+					id_card,
+					sex,
+					phone,
+					shop_name,
+					shop_address,
+					password,
+					payable_date,
+					is_in_use,
+					is_unified_print,
+					is_banner,
+					create_time,
+					last_login_time,
+					contactPerson,
+					is_use_service,
+					service_charge
+				)VALUES(
+					#{id},
+					#{agent_id},
+					#{pay_code_id},
+					#{name},
+					#{account},
+					#{id_card},
+					#{sex},
+					#{phone},
+					#{shop_name},
+					#{shop_address},
+					#{password},
+					#{payable_date},
+					#{is_in_use},
+					#{is_unified_print},
+					#{is_banner},
+					now(), 
+					now(),
+					#{contactPerson},
+					#{is_use_service},
+					#{service_charge}
+				)
+	</insert>
+	
+	
+	<insert id="insertById" parameterType="Shop">
+		INSERT INTO 
+			shop(
+					id,
+					agent_id,
+					pay_code_id,
+					name,
+					account,
+					id_card,
+					sex,
+					phone,
+					shop_name,
+					shop_address,
+					password,
+					payable_date,
+					is_in_use,
+					is_unified_print,
+					is_banner,
+					create_time,
+					last_login_time,
+					contactPerson,
+					is_use_service,
+					service_charge
+				)VALUES(
+					#{id},
+					#{agent_id},
+					#{pay_code_id},
+					#{name},
+					#{account},
+					#{id_card},
+					#{sex},
+					#{phone},
+					#{shop_name},
+					#{shop_address},
+					#{password},
+					#{payable_date},
+					#{is_in_use},
+					#{is_unified_print},
+					#{is_banner},
+					#{create_time}, 
+					#{last_login_time},
+					#{contactPerson},
+					#{is_use_service},
+					#{service_charge}
+				)
+	
+				ON DUPLICATE KEY
+				UPDATE
+				 	agent_id 			= 	#{agent_id},
+					pay_code_id 		= 	#{pay_code_id},
+					name 				= 	#{name},
+					id_card 			= 	#{id_card},
+					sex					=	#{sex},
+					phone 				= 	#{phone},
+					shop_name			=	#{shop_name},
+					shop_address		=	#{shop_address},
+					password			=	#{password},
+					payable_date		=	#{payable_date},
+					is_in_use			=	#{is_in_use},
+					is_unified_print	=	#{is_unified_print},
+					is_banner			=	#{is_banner},
+					create_time			=	#{create_time},
+					last_login_time		=	#{last_login_time},
+					contactPerson		=	#{contactPerson},
+					is_use_service		=	#{is_use_service},
+					service_charge		=	#{service_charge},
+					sync_status			=	#{sync_status}
+	</insert>
+	
+	<delete id="deleteShop">
+		DELETE 
+		FROM shop
+		WHERE id = #{id}
+	</delete>
+	
+	
+	<select id="getShopById" resultType="Shop">
+		SELECT 
+			id,
+			agent_id,
+			pay_code_id,
+			name,account,
+			id_card,
+			sex,
+			phone,
+			shop_name,
+			shop_address,
+			password,
+			payable_date,
+			is_in_use,
+			is_unified_print,
+			is_banner,
+			create_time,
+			last_login_time,
+			contactPerson,
+			is_use_service,
+			service_charge,
+			sync_status
+		FROM shop 
+		WHERE id = #{0}
+	</select>
+	
+	<select id="getShopListByAgent_id" resultType="Shop">
+		SELECT * FROM shop WHERE agent_id = #{0} ORDER BY id
+	</select>
+	
+	<select id="getBannerListByAgentId" resultType="Banner">
+	 	SELECT * FROM banner WHERE agent_id = #{0} ORDER BY id  
+	</select>
+	
+	<select id="getShopList" resultType="Shop">
+		SELECT * FROM shop ORDER BY id
+	</select>
+	
+	 <update id="updateShop">
+		UPDATE 
+			shop 
+		SET 
+			agent_id 			= 	COALESCE( #{agent_id} , agent_id ),
+			pay_code_id 		= 	COALESCE(#{pay_code_id},pay_code_id),
+			name 				= 	COALESCE(#{name},name),
+			id_card 			= 	COALESCE(#{id_card},id_card),
+			sex					=	COALESCE(#{sex},sex),
+			phone 				= 	COALESCE(#{phone},phone),
+			shop_name			=	COALESCE(#{shop_name},shop_name),
+			shop_address		=	COALESCE(#{shop_address},shop_address),
+			password			=	COALESCE(#{password},password),
+			payable_date		=	COALESCE(#{payable_date},payable_date),
+			is_in_use			=	COALESCE(#{is_in_use},is_in_use),
+			is_unified_print	=	COALESCE(#{is_unified_print},is_unified_print),
+			is_banner			=	COALESCE(#{is_banner},is_banner),
+			create_time			=	COALESCE(#{create_time},create_time),
+			last_login_time		=	COALESCE(#{last_login_time},last_login_time),
+			contactPerson		=	COALESCE(#{contactPerson},contactPerson),
+			is_use_service		=	COALESCE(#{is_use_service},is_use_service),
+			service_charge		=	COALESCE(#{service_charge},service_charge),
+			sync_status			=	COALESCE(#{sync_status},sync_status)
+		WHERE id = #{id}
+	</update>
+	
+	
+	 <update id="updateShopPayCodeId">
+		UPDATE
+			shop
+		SET 
+			pay_code_id = #{pay_code_id},
+			sync_status	=	0
+		WHERE id = #{id}
+	</update>
+	
+	
+	<update id="updateAgentPassword">
+		UPDATE
+			agent
+		SET
+			password = #{1}
+		WHERE
+			id = #{0}
+	</update>
+	
+	<update id="updateShopPassword">
+		UPDATE
+			shop
+		SET
+			password = #{1},
+			sync_status	=	0
+		WHERE
+			id = #{0}
+	</update>
+	
+	<update id="updateStaffPassword">
+		UPDATE
+			staff
+		SET
+			password = #{1},
+			sync_status	=	0
+		WHERE
+			id = #{0}
+	</update>
+
+	<!-- 同步数据  -->
+	<select id="selectBySyncStatusAndShopId" resultType="Shop">
+		SELECT
+			id,
+			agent_id,
+			pay_code_id,
+			name,
+			account,
+			id_card,
+			sex,
+			phone,
+			shop_name,
+			shop_address,
+			password,
+			payable_date,
+			is_in_use,
+			is_unified_print,
+			is_banner,
+			create_time,
+			last_login_time,
+			contactPerson,
+			is_use_service,
+			service_charge,
+			sync_status
+		FROM
+			shop
+		WHERE
+			id = #{0} and sync_status = 0
+	</select>
+
+</mapper>

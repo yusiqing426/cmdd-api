@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.BannerDao">
+	
+	<insert id="addBanner" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO banner(agent_id,banner_id,serial,name) 
+		VALUES (#{agent_id},#{banner_id},#{serial},#{name})
+	</insert>
+	
+	<select id="getBanner" resultType="Banner">
+		SELECT id, agent_id, banner_id,serial,name
+		FROM banner
+		WHERE id = #{0}
+	</select>
+	
+	<select id="getBannerListByAgentId" resultType="Banner">
+		SELECT 
+			id,agent_id,banner_id,serial,name  
+		FROM 
+			banner 
+		WHERE 
+			agent_id = #{agent_id} order by serial
+	</select>
+	
+	<delete id="deleteBanner">
+		DELETE 
+		FROM banner
+		WHERE id = #{id}
+	</delete>
+	
+	<update id="updateBanner" parameterType="Banner">
+		UPDATE banner
+		SET banner_id = COALESCE(#{banner_id},banner_id),
+			agent_id = COALESCE(#{agent_id},agent_id),
+			serial = COALESCE(#{serial},serial),
+			name = COALESCE(#{name},name)
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

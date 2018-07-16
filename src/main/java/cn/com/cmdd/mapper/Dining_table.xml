@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.Dining_tableDao">
+	<insert id="insert" parameterType="Dining_table">
+		<selectKey resultType="Long" order="BEFORE" keyProperty="id">
+				SELECT COALESCE(#{id},UUID_SHORT()) AS id
+		</selectKey>
+				INSERT  INTO
+				  dining_table(
+					id,
+					shop_id,
+					logo_id,
+					serial_id,
+					name,
+					address,
+					seating_number,
+					is_out,
+					status,
+					is_enable,
+					description,
+					sync_status
+				)
+				VALUES(
+					#{id},
+					#{shop_id},
+					#{logo_id},
+					#{serial_id},
+					#{name},
+					#{address},
+					#{seating_number},
+					#{is_out},
+					#{status},
+					#{is_enable},
+					#{description},
+					#{sync_status}
+				)
+	</insert>
+
+	<insert id="insertById" parameterType="Dining_table">
+		INSERT	INTO
+			dining_table(
+				id,
+				shop_id,
+				logo_id,
+				serial_id,
+				name,
+				address,
+				seating_number,
+				is_out,
+				status,
+				is_enable,
+				description,
+				sync_status)
+		VALUES(
+			#{id},
+			#{shop_id},
+			#{logo_id},
+			#{serial_id},
+			#{name},
+			#{address},
+			#{seating_number},
+			#{is_out},
+			#{status},
+			#{is_enable},
+			#{description},
+			#{sync_status}
+		)
+		ON DUPLICATE KEY
+		UPDATE
+			shop_id			=	#{shop_id},
+			logo_id			=	#{logo_id},
+			serial_id 		=	#{serial_id},
+			name 			=	#{name},
+			address 		=	#{address},
+			seating_number	=	#{seating_number},
+			is_out 			=	#{is_out},
+			status 			=	#{status},
+			is_enable 		=	#{is_enable},
+			description 	=	#{description},
+			sync_status 	= 	#{sync_status}
+	</insert>
+
+	<delete id="deleteDining_table" parameterType="Long">
+		DELETE	
+		FROM 
+			dining_table
+		WHERE 
+			id=#{id} 
+	</delete>
+
+	<update id="updateDining_table" parameterType="Dining_table">
+		UPDATE 
+			dining_table
+		SET  
+			shop_id			=	COALESCE(#{shop_id},shop_id)				,
+			logo_id			=	COALESCE(#{logo_id},logo_id)				,
+			serial_id 		=	COALESCE(#{serial_id},serial_id)			,
+			name 			=	COALESCE(#{name},name)						,
+			address 		=	COALESCE(#{address},address)				,
+			seating_number	=	COALESCE(#{seating_number},seating_number)	,
+			is_out 			=	COALESCE(#{is_out},is_out)					,
+			status 			=	COALESCE(#{status},status)					,
+			is_enable 		=	COALESCE(#{is_enable},is_enable)			,
+			description 	=	COALESCE(#{description},description)		,
+			sync_status 	= 	COALESCE(#{sync_status},sync_status)
+		WHERE
+			id=#{id}
+	</update>
+	
+	<update id="updateStatus" parameterType="Dining_table">
+		UPDATE 
+			dining_table 
+		SET
+			status =  COALESCE(#{status},status)
+		WHERE
+			id=#{id}
+	</update>
+
+	<select id="getDining_table" resultType="Dining_table">
+		SELECT 
+			id,shop_id,logo_id,serial_id,name,address,seating_number,is_out,status,is_enable,description,sync_status
+		FROM 
+			dining_table
+		<trim prefix="WHERE" >
+			<if test="shop_id!=null">
+				shop_id=#{shop_id}
+			</if>
+			<if test="id!=null">
+				id=#{id}
+			</if>
+			AND is_enable = 1
+		</trim>
+		ORDER BY id ASC
+	</select>
+	
+	
+	<select id="select" resultType="Dining_table">
+		SELECT 
+			id,shop_id,logo_id,serial_id,name,address,seating_number,is_out,status,is_enable,description,sync_status
+		FROM 
+			dining_table
+		WHERE
+			id=#{id}
+	</select>
+	
+	<select id="selectLists" resultType="Dining_table">
+		SELECT 
+			id,shop_id,logo_id,serial_id,name,address,seating_number,is_out,status,is_enable,description,sync_status
+		FROM 
+			dining_table
+		WHERE
+			shop_id=#{shopId} AND is_enable = 1	
+		ORDER BY 
+			id DESC
+	</select>
+	
+	<!-- 同步数据  -->
+	<select id="selectByIsUpload" resultType="Dining_table">
+		SELECT 
+			id,
+			shop_id,
+			logo_id,
+			serial_id,
+			name,
+			address,
+			seating_number,
+			is_out,
+			status,
+			is_enable,
+			description,
+			sync_status
+			
+		FROM 
+			dining_table
+		WHERE 
+			shop_id = #{0} and sync_status = 0
+	</select>
+	
+</mapper>

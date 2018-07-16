@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.AgentPayDao">
+	
+
+	<insert id="addAgentPay" parameterType="AgentPay" useGeneratedKeys="true" keyProperty="id" >
+		INSERT into agent_pay(agent_id,payable_expenses,pay_date,create_time,paid_date,is_pay)
+		VALUES(#{agent_id},#{payable_expenses},now(),now(),now(),#{is_pay})
+	</insert> 
+	
+	 <select id="getAgentPayList" resultType="AgentPay">
+		select p.id,	
+			p.agent_id,
+			p.payable_expenses,
+			p.pay_date,
+			p.create_time,
+			p.paid_date,
+			p.is_pay,
+			a.name AS name,
+			a.company_name AS company_name,
+			a.account AS account
+			
+			FROM agent_pay AS p INNER JOIN agent AS a ON p.agent_id = a.id
+			WHERE p.is_pay = '0'
+			ORDER BY id
+	</select> 
+	
+	<!-- 得到代理商缴费历史情况 -->
+	<select id="getAgentPayListByAgentId" parameterType="int" resultType="AgentPay">
+		SELECT p.id, 
+		p.agent_id, 
+		p.payable_expenses,
+		p.pay_date,
+		p.is_pay,
+		p.create_time,
+		p.paid_date,
+		a.name AS name,
+		a.company_name AS company_name,
+		a.account AS account
+	
+		FROM agent_pay AS p INNER JOIN agent AS a ON p.agent_id = a.id
+		WHERE p.agent_id= #{agent_id}
+		ORDER BY id
+		
+	</select>
+	
+	
+	<!-- 根据id 得到代理商缴费情况 -->
+	<select id="getAgentPayById" parameterType="int" resultType="AgentPay">
+		SELECT p.id, 
+		p.agent_id, 
+		p.payable_expenses,
+		p.pay_date,
+		p.is_pay,
+		p.create_time,
+		p.paid_date,
+		a.name AS name,
+		a.company_name AS company_name
+	
+		FROM agent_pay AS p INNER JOIN agent AS a ON p.agent_id = a.id
+		WHERE p.id = #{id}
+		ORDER BY id
+		
+	</select>
+	
+	 <update id="updateAgentPay">
+		UPDATE agent_pay 
+		SET agent_id = COALESCE(#{agent_id},agent_id),
+			payable_expenses = COALESCE(#{payable_expenses},payable_expenses),
+			pay_date = COALESCE(#{pay_date},pay_date),
+			is_pay=COALESCE(#{is_pay},is_pay),
+			paid_date = now()
+			
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

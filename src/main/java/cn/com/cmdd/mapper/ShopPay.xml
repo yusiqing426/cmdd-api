@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.com.cmdd.dao.ShopPayDao">
+
+	
+	<insert id="addShopPay" parameterType="ShopPay" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO shop_pay(shop_id,total_payable,pay_date,is_pay,paid_date,create_time) 
+		VALUES (#{shop_id},#{total_payable},now(),#{is_pay},now(),now())
+	</insert>
+	
+	<select id="getShopPayById" resultType="ShopPay">
+
+		SELECT p.id, 
+		p.shop_id, 
+		p.total_payable,
+		p.pay_date,
+		p.is_pay,
+		p.create_time,
+		p.paid_date,
+		s.name AS name,
+		s.shop_name AS shop_name,
+		s.account AS account
+	
+		FROM shop_pay AS p INNER JOIN shop AS s ON p.shop_id = s.id
+		WHERE p.id = #{0}
+		ORDER BY p.id
+		
+	</select>
+	
+	<select id="getShopPayListByAgentId" resultType="ShopPay">
+		SELECT p.id, 
+		p.shop_id, 
+		p.total_payable,
+		p.pay_date,
+		p.is_pay,
+		p.create_time,
+		p.paid_date,
+		s.name AS name,
+		s.shop_name AS shop_name,
+		s.account AS account
+	
+		FROM shop_pay AS p INNER JOIN shop AS s ON p.shop_id = s.id
+		WHERE s.agent_id = #{0} AND p.is_pay = '0'
+		ORDER BY id
+	</select>
+	
+	
+	<!-- 平台缴费查询功能添加 -->
+	<select id="getShopPayByTime" resultType="ShopPay">
+		
+		<if test="agent_id==null">
+		SELECT  
+		SUM(total_payable) AS payable,
+		is_pay 
+		FROM shop_pay 
+		<choose>
+			<when test="start_time!=null and end_time!= null">
+				WHERE create_time BETWEEN #{start_time} AND #{end_time}
+			</when>
+			<when test="start_time==null and end_time!= null">
+				<![CDATA[ WHERE create_time <= #{end_time} ]]>
+			</when>
+			<when test="start_time!=null and end_time== null">
+				WHERE create_time >= #{start_time}
+			</when>
+			 <otherwise>  
+                GROUP BY is_pay 
+            </otherwise>  
+		</choose> 
+		
+		</if> 
+		<if test="agent_id!=null and shop_id == null">
+		SELECT  
+		SUM(sp.total_payable) AS payable,
+		sp.is_pay 
+		FROM shop_pay AS sp INNER JOIN shop AS s ON sp.shop_id = s.id 
+		
+		<choose>
+			<when test="start_time!=null and end_time!= null">
+				WHERE s.agent_id = #{agent_id} AND sp.create_time BETWEEN #{start_time} AND #{end_time}
+			</when>
+			<when test="start_time==null and end_time!= null">
+				<![CDATA[ WHERE s.agent_id = #{agent_id} AND sp.create_time <= #{end_time} ]]>
+			</when>
+			<when test="start_time!=null and end_time== null">
+				WHERE s.agent_id = #{agent_id} AND sp.create_time >= #{start_time}
+			</when>
+			<otherwise>  
+				WHERE s.agent_id = #{agent_id}
+            </otherwise>
+		</choose> 
+		 GROUP BY sp.is_pay
+		</if> 
+		<if test="agent_id!=null and shop_id != null">
+		SELECT  
+		SUM(sp.total_payable) AS payable,
+		sp.is_pay 
+		FROM shop_pay AS sp INNER JOIN shop AS s ON sp.shop_id = s.id
+		
+		<choose>
+			<when test="start_time!=null and end_time!= null">
+				WHERE s.agent_id = #{agent_id} AND s.id=#{shop_id} AND sp.create_time BETWEEN #{start_time} AND #{end_time}
+			</when>
+			<when test="start_time==null and end_time!= null">
+				<![CDATA[ WHERE s.agent_id = #{agent_id} AND s.id=#{shop_id} AND sp.create_time <= #{end_time} ]]>
+			</when>
+			<when test="start_time!=null and end_time== null">
+				WHERE s.agent_id = #{agent_id} AND s.id=#{shop_id} AND sp.create_time >= #{start_time}
+			</when> 
+			 <otherwise>  
+               WHERE s.agent_id = #{agent_id} AND s.id=#{shop_id} 
+            </otherwise> 
+		</choose> 
+		 GROUP BY sp.is_pay
+		</if>
+	</select>
+	
+	
+	<select id="getShopPayListByShopId" resultType="ShopPay">
+		
+		SELECT p.id, 
+		p.shop_id, 
+		p.total_payable,
+		p.pay_date,
+		p.is_pay,
+		p.create_time,
+		p.paid_date,
+		s.name AS name,
+		s.shop_name AS shop_name,
+		s.account AS account
+		
+		FROM shop_pay AS p INNER JOIN shop AS s ON p.shop_id = s.id
+		WHERE p.shop_id = #{0}
+		ORDER BY id
+		
+	</select>
+	
+	 <update id="updateShopPay">
+		UPDATE shop_pay 
+		SET shop_id = COALESCE(#{shop_id},shop_id),
+			total_payable = COALESCE(#{total_payable},total_payable),
+			pay_date = COALESCE(#{pay_date},pay_date),
+			is_pay=COALESCE(#{is_pay},is_pay),
+			paid_date = now()
+			
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
